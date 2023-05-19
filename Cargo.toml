@@ -1,0 +1,3 @@
+[package]
+name = "rust-on-riscv"
+version = "0.0.1"
