@@ -41,10 +41,10 @@ impl Write for Serial {
 
 #[no_mangle]
 #[link_section = ".init"]
-pub fn _start() -> ! {
+pub extern "C" fn _start() -> ! {
 
     extern "C" {
-        static  _stack_start: usize;
+        static  _stack_start: u64;
     }
 
     type FnPtr = fn() -> !;
@@ -68,7 +68,7 @@ pub fn _start() -> ! {
     let mut cons = Serial;
     write!(cons, "Hello {}!", "Stephane").unwrap();
     
-    //cons.write_str(&_msg).unwrap();
+    cons.write_str(&_msg).unwrap();
 
     loop {}
 }

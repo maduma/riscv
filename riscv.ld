@@ -14,41 +14,15 @@ OUTPUT_ARCH("riscv")
 
 ENTRY(_start)
 
-/* Memory Layout */
 
 MEMORY
 {
     ram : ORIGIN = 0x80000000, LENGTH = 0x7ffffff 
 }
 
-/* SECTIONS Commmand 
-SECTIONS { ...
-  secname : {  
-    contents
-  }
-... }
-In above, secname is the output section name, content is the 
-content that goes into the section. The output section 
-would be created only if there is any content. 
-
 SECTIONS
 {
-  . = 0x10000;
-  .text : { *(.text) }
-  . = 0x8000000;
-  .data : { *(.data) }
-  .bss : { *(.bss) }
-  _etext = .;
-}
-You write the `SECTIONS' command as the keyword `SECTIONS',
-followed by a series of symbol assignments and output section descriptions enclosed in curly braces.
-
-The symbol `_etext' will be defined as the address following the last `.bss' input section
-*/
-
-SECTIONS
-{
-    .init : /* start address is 0x80000000 */
+    .init :
     {
          KEEP(*(.init))
     }
@@ -57,20 +31,38 @@ SECTIONS
 
     .code :
     {
-         *(.code*)
-         *(.text*)
+         *(.code* .code.*)
+         *(.text* .text.*)
     }
     > ram
+    . = ALIGN(4);
+
+    .rodata :
+    {
+        *(.rodata .rodata.*);
+    } > ram
+    . = ALIGN(4);
+
+    .bss :
+    {
+        _sbss = .;
+        *(.bss .bss.*);
+        _ebss = .;
+    } > ram
     . = ALIGN(4);
 
     .data :
     {
-        *(.data*)
+        _sdata = .;
+        *(.data .data.*)
+        _edata = .;
     }
     > ram
     . = ALIGN(4);
 
+    _sidata = LOADADDR(.data);
+
     /* Set Stack after code & data */
-    _stack_start = .;
+    _stack_start = 0x80010000;
 }
 
