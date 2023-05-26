@@ -1,13 +1,16 @@
 #![no_std]
 #![no_main]
 
+use core::panic::PanicInfo;
+use core::arch::asm;
 use core::fmt::Write;
+use core::fmt::Result;
 
 const UART: usize = 0x10000000;
 const THR_EMPTY_AND_LINE_IDLE: u8 = 1 << 6;
 
 #[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
+fn panic(_info: &PanicInfo) -> ! {
     loop{}
 }
 
@@ -30,7 +33,7 @@ pub fn console(uart: usize, msg: &str) {
 struct Serial;
 
 impl Write for Serial {
-    fn write_str(&mut self, msg: &str) -> core::fmt::Result {
+    fn write_str(&mut self, msg: &str) -> Result {
         console(UART, msg);
         Ok(())
     }
@@ -49,9 +52,9 @@ pub fn _start() -> ! {
 
     unsafe{
         let sp = &_stack_start;
-        core::arch::asm!("csrw mtvec, {}" ,
+        asm!("csrw mtvec, {}" ,
             in(reg) th);
-        core::arch::asm!("mv sp, {}" ,
+        asm!("mv sp, {}" ,
             in(reg) sp);
     }
 
