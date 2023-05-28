@@ -12,8 +12,8 @@ target = "riscv64imac-unknown-none-elf"
 #  - custom linker script
 #  - align power of 2
 
-rustflags = [
-   "-C", "link-arg=-Triscv.ld",
-   "-C", "llvm-args=-align-all-functions=2",
-   "-C", "debuginfo=0"
-]
+# rustflags = [
+#    "-C", "link-arg=-Triscv.ld",
+#    "-C", "llvm-args=-align-all-functions=2",
+#    "-C", "debuginfo=0"
+# ]

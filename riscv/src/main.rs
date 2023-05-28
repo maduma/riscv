@@ -5,6 +5,8 @@ use core::panic::PanicInfo;
 use core::arch::asm;
 use core::fmt::Write;
 use core::fmt::Result;
+use core::ptr::read_volatile;
+use core::ptr::write_volatile;
 
 const UART: usize = 0x10000000;
 const THR_EMPTY_AND_LINE_IDLE: u8 = 1 << 6;
@@ -15,17 +17,17 @@ fn panic(_info: &PanicInfo) -> ! {
 }
 
 #[no_mangle]
- fn trap_handler() -> ! {
+fn trap_handler() -> ! {
     loop{}
 }
 
-pub fn console(uart: usize, msg: &str) {
-    let base_addr = uart as *mut u8;
+fn ns16550(addr: usize, msg: &str) {
+    let base_addr = addr as *mut u8;
     unsafe {
         let status_addr = base_addr.offset(5);
         for c in msg.bytes() {
-            while core::ptr::read_volatile(status_addr) & THR_EMPTY_AND_LINE_IDLE == 0 { }
-            core::ptr::write_volatile(base_addr, c);
+            while read_volatile(status_addr) & THR_EMPTY_AND_LINE_IDLE == 0 { }
+            write_volatile(base_addr, c);
         }
     }
 }
@@ -34,7 +36,7 @@ struct Serial;
 
 impl Write for Serial {
     fn write_str(&mut self, msg: &str) -> Result {
-        console(UART, msg);
+        ns16550(UART, msg);
         Ok(())
     }
 }
@@ -44,18 +46,17 @@ impl Write for Serial {
 pub extern "C" fn _start() -> ! {
 
     extern "C" {
-        static  _stack_start: u64;
+        static  _stack_start: u32;
     }
 
     type FnPtr = fn() -> !;
     let th: FnPtr = trap_handler;
 
     unsafe{
-        let sp = &_stack_start;
-        asm!("csrw mtvec, {}" ,
-            in(reg) th);
-        asm!("mv sp, {}" ,
-            in(reg) sp);
+        asm!("csrw mtvec, {}",in(reg) th);
+
+        //let sp = &_stack_start;
+        //asm!("mv sp, {}", in(reg) sp);
     }
 
     let _msg ="\
