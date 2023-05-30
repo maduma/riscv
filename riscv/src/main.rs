@@ -55,21 +55,18 @@ pub extern "C" fn _start() -> ! {
     unsafe{
         asm!("csrw mtvec, {}",in(reg) th);
 
-        //let sp = &_stack_start;
-        //asm!("mv sp, {}", in(reg) sp);
+        let sp = &_stack_start;
+        asm!("mv sp, {}", in(reg) sp);
     }
 
-    let _msg ="\
+    let msg ="\
         Hello World!\n\
         How are you men!\n\
         this\tis\tmy\tname\n\
         one\ttime\tis\tthere\n\
         ";
 
-    let mut cons = Serial;
-    write!(cons, "Hello {}!", "Stephane").unwrap();
-    
-    cons.write_str(&_msg).unwrap();
+    ns16550(UART, msg);
 
     loop {}
 }

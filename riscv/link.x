@@ -63,6 +63,6 @@ SECTIONS
     _sidata = LOADADDR(.data);
 
     /* Set Stack after code & data */
-    _stack_start = 0x80010000;
+    _stack_start = .;
 }
 
