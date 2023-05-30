@@ -44,6 +44,25 @@ fn main() -> ! {
 
     let mut cons = Serial;
     write!(cons, "Hello {}!\n", "Stephane").unwrap();
+    extern "C" {
+        // Boundaries of the .bss section
+        static mut _ebss: u32;
+        static mut _sbss: u32;
+
+        // Boundaries of the .data section
+        static mut _edata: u32;
+        static mut _sdata: u32;
+
+        // Initial values of the .data section (stored in Flash)
+        static _sidata: u32;
+    }
+    unsafe {
+        write!(cons, "_sdata {:p}\n", &_sdata).unwrap();
+        write!(cons, "_edata {:p}\n", &_edata).unwrap();
+        write!(cons, "_sidata {:p}\n", &_sidata).unwrap();
+        write!(cons, "_sbss {:p}\n", &_sbss).unwrap();
+        write!(cons, "_ebss {:p}\n", &_ebss).unwrap();
+    }
 
     loop { }
 }
