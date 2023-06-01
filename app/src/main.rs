@@ -8,6 +8,7 @@ use core::ptr::read_volatile;
 use core::ptr::write_volatile;
 use core::fmt::Write;
 use core::fmt::Result;
+use core::arch::asm;
 use core::ptr;
 
 const UART: usize = 0x10000000;
@@ -33,6 +34,21 @@ impl Write for Serial {
     }
 }
 
+#[inline]
+fn cmp_addr<T>(p1: *const T, p2: *const T) -> bool {
+    let i: usize;
+    unsafe {
+        asm!(
+            "sub {a}, {a}, {b}",
+            "snez {c}, {a}",
+            a = in(reg) p1,
+            b = in(reg) p2,
+            c = out(reg) i,
+        );
+    }
+    i == 0
+}
+
 #[entry]
 fn main() -> ! {
 
@@ -44,31 +60,13 @@ fn main() -> ! {
         // Boundaries of the .data section
         static _edata: u32;
         static _sdata: u32;
-
         // Initial values of the .data section (stored in Flash)
         static _sidata: u32;
     }
 
     let mut cons = Serial;
-
-    unsafe {
-        let a = &_sdata as *const u32;
-	let b = &_sidata as *const u32;
-	let c = &_sdata;
-        let d = &_sidata;
-        write!(cons, "_sdata {:p}\n", &_sdata).unwrap();
-        write!(cons, "_edata {:p}\n", &_edata).unwrap();
-        write!(cons, "_sidata {:p}\n", &_sidata).unwrap();
-        write!(cons, "_sbss {:p}\n", &_sbss).unwrap();
-        write!(cons, "_ebss {:p}\n", &_ebss).unwrap();
-        write!(cons, "{:?}\n", ptr::addr_of!(_sidata)).unwrap();
-        write!(cons, "{:?} {:?} {}\n", ptr::addr_of!(_sdata), ptr::addr_of!(_sidata), ptr::addr_of!(_sdata) == ptr::addr_of!(_sidata)).unwrap();
-        write!(cons, "{:?} {:?}\n", a, b).unwrap();
-        write!(cons, "same1? {}\n", a == b).unwrap();
-        write!(cons, "same2? {}\n", ptr::eq(c, d)).unwrap();
-        write!(cons, "same2? {}\n", ptr::eq(&_sdata, &_sidata)).unwrap();
-        write!(cons, "same3? {}\n", ptr::eq(&_sdata as *const _, &_sidata as *const _)).unwrap();
-    }
+    let is_eq = unsafe { cmp_addr(ptr::addr_of!(_sdata), ptr::addr_of!(_sidata)) };
+    write!(cons, "{}", is_eq).unwrap();
 
     loop { }
 }

@@ -129,7 +129,7 @@ dependencies = [
 [[package]]
 name = "riscv-rt"
 version = "0.11.0"
-source = "git+https://github.com/maduma/riscv-rt.git#4569e6c174c0d7d5847243544ed18337769c9c61"
+source = "git+https://github.com/maduma/riscv-rt.git#94a7db397e0a559662331d02ee8d8a8d0e98e940"
 dependencies = [
  "r0",
  "riscv",
@@ -140,7 +140,7 @@ dependencies = [
 [[package]]
 name = "riscv-rt-macros"
 version = "0.2.0"
-source = "git+https://github.com/maduma/riscv-rt.git#4569e6c174c0d7d5847243544ed18337769c9c61"
+source = "git+https://github.com/maduma/riscv-rt.git#94a7db397e0a559662331d02ee8d8a8d0e98e940"
 dependencies = [
  "proc-macro2",
  "quote",

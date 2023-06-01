@@ -5,8 +5,7 @@ use core::panic::PanicInfo;
 use core::arch::asm;
 use core::fmt::Write;
 use core::fmt::Result;
-use core::ptr::read_volatile;
-use core::ptr::write_volatile;
+use core::ptr;
 
 const UART: usize = 0x10000000;
 const THR_EMPTY_AND_LINE_IDLE: u8 = 1 << 6;
@@ -26,8 +25,8 @@ fn ns16550(addr: usize, msg: &str) {
     unsafe {
         let status_addr = base_addr.offset(5);
         for c in msg.bytes() {
-            while read_volatile(status_addr) & THR_EMPTY_AND_LINE_IDLE == 0 { }
-            write_volatile(base_addr, c);
+            while ptr::read_volatile(status_addr) & THR_EMPTY_AND_LINE_IDLE == 0 { }
+            ptr::write_volatile(base_addr, c);
         }
     }
 }
@@ -59,14 +58,16 @@ pub extern "C" fn _start() -> ! {
         asm!("mv sp, {}", in(reg) sp);
     }
 
-    let msg ="\
-        Hello World!\n\
-        How are you men!\n\
-        this\tis\tmy\tname\n\
-        one\ttime\tis\tthere\n\
-        ";
+    //let msg ="\
+    //    Hello World!\n\
+    //    How are you men!\n\
+    //    this\tis\tmy\tname\n\
+    //    one\ttime\tis\tthere\n\
+    //    ";
 
-    ns16550(UART, msg);
+    //ns16550(UART, msg);
+
+    unsafe {ns16550(UART, if _stack_start as usize == 0 { "zero" } else { "someting" });}
 
     loop {}
 }
