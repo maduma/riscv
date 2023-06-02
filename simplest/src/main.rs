@@ -38,7 +38,6 @@ impl Write for Serial {
 }
 
 #[no_mangle]
-#[link_section = ".init"]
 pub extern "C" fn _start_rust() -> ! {
 
     ns16550(UART, "Hello world!\n");
