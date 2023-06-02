@@ -1,4 +1,4 @@
-.section .init, "ax"
+.section .init
 
 _start:
     la a0, _trap_handler
