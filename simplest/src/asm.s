@@ -11,7 +11,3 @@ _start:
 
 _trap_handler:
     j _trap_handler
-
-_start_rust:
-    j _start_rust
-
