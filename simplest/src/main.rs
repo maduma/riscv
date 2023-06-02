@@ -7,7 +7,7 @@ use core::ptr;
 use core::fmt::Write;
 use core::fmt::Result;
 
-global_asm!(include_str!("asm.s"));
+global_asm!(include_str!("init.s"));
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
