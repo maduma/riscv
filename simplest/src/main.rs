@@ -1,11 +1,12 @@
 #![no_std]
 #![no_main]
 
+mod serial;
+
 use core::arch::global_asm;
 use core::panic::PanicInfo;
-use core::ptr;
+use serial::UART16550A;
 use core::fmt::Write;
-use core::fmt::Result;
 
 global_asm!(include_str!("init.s"));
 
@@ -14,33 +15,12 @@ fn panic(_info: &PanicInfo) -> ! {
     loop{}
 }
 
-const UART: usize = 0x10000000;
-const THR_EMPTY_AND_LINE_IDLE: u8 = 1 << 6;
-
-fn ns16550(addr: usize, msg: &str) {
-    let base_addr = addr as *mut u8;
-    unsafe {
-        let status_addr = base_addr.offset(5);
-        for c in msg.bytes() {
-            while ptr::read_volatile(status_addr) & THR_EMPTY_AND_LINE_IDLE == 0 { }
-            ptr::write_volatile(base_addr, c);
-        }
-    }
-}
-
-struct Serial;
-
-impl Write for Serial {
-    fn write_str(&mut self, msg: &str) -> Result {
-        ns16550(UART, msg);
-        Ok(())
-    }
-}
 
 #[no_mangle]
 pub extern "C" fn _start_rust() -> ! {
 
-    write!(Serial, "Hello, {}!\n", "RISC-V").unwrap();
+    let console = UART16550A::new();
+    write!(console, "Hello, {}!\n", "RISC-V").unwrap();
 
     loop {}
 }
