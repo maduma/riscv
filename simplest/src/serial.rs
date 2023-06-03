@@ -42,8 +42,7 @@ impl UART16550A {
 
 impl Write for UART16550A {
     fn write_str(&mut self, msg: &str) -> Result {
-        let uart = UART16550A::new();
-        uart.write_ascii_str(msg);
+        self.write_ascii_str(msg);
         Ok(())
     }
 }
