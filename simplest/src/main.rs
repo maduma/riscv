@@ -19,8 +19,7 @@ fn panic(_info: &PanicInfo) -> ! {
 
 
 #[no_mangle]
-pub extern "C" fn _start_rust() -> ! {
-
+pub extern "C" fn start_rust() -> ! {
     let console = UART::new(UART_ADDR);
     write!(console, "Hello, {}!\n", "RISC-V").unwrap();
 

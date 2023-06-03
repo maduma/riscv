@@ -4,8 +4,7 @@ use volatile_register::RW;
 use volatile_register::RO;
 
 #[repr(C)]
-pub struct UART {
-    // 16550A
+pub struct UART { // 16550A
     rbr_thr_dll: RW<u8>,
     ier_dlm: RW<u8>,
     iir_fcr: RW<u8>,
@@ -35,7 +34,6 @@ impl UART {
     fn write_ascii_str(&mut self, msg: &str) {
         for c in msg.bytes() { self.write_byte(c) }
     }
-
 }
 
 impl Write for UART {

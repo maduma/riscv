@@ -1,12 +1,11 @@
 .section .init
 
-_start:
-    la a0, _trap_handler
+    la a0, trap_handler
     csrw mtvec, a0
-    la sp, _stack_start
+    la sp, stack_start
     mv s0, sp
-    la a0, _start_rust
+    la a0, start_rust
     jr a0
 
-_trap_handler:
-    j _trap_handler
+trap_handler:
+    j trap_handler
