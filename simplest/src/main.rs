@@ -5,7 +5,7 @@ mod serial;
 
 use core::arch::global_asm;
 use core::panic::PanicInfo;
-use serial::UART16550A;
+use serial::UART;
 use core::fmt::Write;
 
 global_asm!(include_str!("init.s"));
@@ -19,7 +19,7 @@ fn panic(_info: &PanicInfo) -> ! {
 #[no_mangle]
 pub extern "C" fn _start_rust() -> ! {
 
-    let console = UART16550A::new();
+    let console = UART::new();
     write!(console, "Hello, {}!\n", "RISC-V").unwrap();
 
     loop {}
