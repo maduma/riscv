@@ -1,6 +1,8 @@
 #![no_std]
 #![no_main]
 
+const UART_ADDR: usize = 0x10000000;
+
 mod serial;
 
 use core::arch::global_asm;
@@ -19,7 +21,7 @@ fn panic(_info: &PanicInfo) -> ! {
 #[no_mangle]
 pub extern "C" fn _start_rust() -> ! {
 
-    let console = UART::new();
+    let console = UART::new(UART_ADDR);
     write!(console, "Hello, {}!\n", "RISC-V").unwrap();
 
     loop {}
