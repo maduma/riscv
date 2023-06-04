@@ -1,8 +1,9 @@
 #![no_std]
 #![no_main]
 
-//const UART_ADDR: usize = 0x10000000;
-const UART_ADDR: usize = 0x11300;
+#[allow(dead_code)]
+const UART_VIRT_ADDR: usize = 0x10000000;
+const UART_SHAKTI_ADDR: usize = 0x11300;
 
 mod serial;
 
@@ -24,7 +25,7 @@ fn panic(_info: &PanicInfo) -> ! {
 pub extern "C" fn start_rust() -> ! {
     let mut val: usize;
     unsafe { asm!("csrr {}, misa", out(reg) val) };
-    let console = UART_SHAKTI::new(UART_ADDR);
+    let console: &mut UART_SHAKTI = UART_SHAKTI::new(UART_SHAKTI_ADDR);
     write!(console, "Hello, {}!\n", "RISC-V").unwrap();
     write!(console, "misa: {:#b}\n", val).unwrap();
 
