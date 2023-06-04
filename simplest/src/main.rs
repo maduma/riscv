@@ -20,7 +20,6 @@ fn panic(_info: &PanicInfo) -> ! {
     loop{}
 }
 
-
 #[no_mangle]
 pub extern "C" fn start_rust() -> ! {
     let mut val: usize;
